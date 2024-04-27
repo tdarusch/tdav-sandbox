@@ -1,0 +1,55 @@
+[
+  {
+    "id": 1,
+    "title": "SPARQ Profile Builder",
+    "subtitle": "Senior capstone project",
+    "startDate": "2024-01-10T18:25:43.511Z",
+    "endDate": "2024-05-10T18:25:43.511Z",
+    "description": [
+      {
+        "id": 1,
+        "paragraph": 1,
+        "content": "As part of my senior capstone project in computer science, I led a team in developing a comprehensive web-based solution for a professional services firm, addressing their need for efficient profile management. Our project, titled SPARQ Profile Builder, was designed to enable colleagues to effortlessly store, update, and customize their professional profiles for client consideration. Leveraging React.js for the frontend and Java Spring for the backend, we ensured a seamless user experience while maintaining scalability and robustness. By integrating Google single sign-on authentication, we streamlined access for up to 100 concurrent users, ensuring secure data management."
+      },
+      {
+        "id": 2,
+        "paragraph": 2,
+        "content": "SPARQ Profile Builder boasted a myriad of features, including the ability to input and maintain various component datasets such as contact information, education, work history, projects, skills, and an introductory narrative. We implemented a PostgreSQL database for persistent data storage, ensuring that users could easily retrieve and update their information as needed. Additionally, our platform facilitated the generation of customized PDF profiles, allowing users to select specific data for inclusion and enhancing their presentation capabilities for client interactions. This project underscored my proficiency in full-stack development and my ability to lead a team in delivering practical, client-focused solutions."
+      }
+    ],
+    "technologies": [
+      {
+        "id": 1,
+        "name": "Java"
+      },
+      {
+        "id": 2,
+        "name": "React"
+      },
+      {
+        "id": 3,
+        "name": "PostgreSQL"
+      },
+      {
+        "id": 4,
+        "name": "Heroku"
+      },
+      {
+        "id": 5,
+        "name": "IText"
+      },
+      {
+        "id": 6,
+        "name": "MUI v5"
+      },
+      {
+        "id": 7,
+        "name": "axios"
+      },
+      {
+        "id": 8,
+        "name": "Postman"
+      }
+    ]
+  }
+]

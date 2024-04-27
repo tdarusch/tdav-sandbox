@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
-import { Container, Tab, TabList, Tabs, Box, Avatar, TabIndicator } from '@chakra-ui/react';
 import React from 'react';
+import { Tab, TabList, Tabs, Box, Avatar } from '@chakra-ui/react';
 import { Outlet, useNavigate } from 'react-router';
 import { useMatch } from 'react-router-dom';
+
 import logo from '../../../public/sandbox.svg';
 import Home from '../Home/Home';
 
@@ -20,10 +20,14 @@ const tabs = [
     route: '/sandbox'
   },
   {
+    label: 'Documentation',
+    route: '/documentation'
+  },
+  {
     label: 'Contact',
     route: '/contact'
   }
-]
+];
 
 const TopNavigation = () => {
   const navigate = useNavigate();
@@ -47,20 +51,24 @@ const TopNavigation = () => {
         >
           <TabList>
             {tabs.map((tab, index) => (
-              <Tab onClick={() => navigate(tab.route)} key={index}>
+              <Tab 
+                key={index}
+                color='gray.400'
+                _selected={{ color: 'gray.700' }}
+                onClick={() => navigate(tab.route)} 
+              >
                 {tab.label}
               </Tab>
             ))}
           </TabList>
-          <TabIndicator mt='-1.5px' height='2px' bg='gray.300' borderRadius='1px' />
         </Tabs>
       </Box>
-      <Container centerContent mt={2}>
+      <>
         {isRoot 
           ? <Home />
           : <Outlet />
         }
-      </Container>
+      </>
     </>
   );
 };
