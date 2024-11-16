@@ -40,11 +40,11 @@ const Navigation = () => {
 
   const mobileDrawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
-      <Typography variant='h6'>TDAV Sandbox</Typography>
+      <Typography variant='h6'>Sandbox</Typography>
       <Divider />
       <List>
         {navRoutes.map(({ label, route }) => (
-          <ListItem key={label}>
+          <ListItem key={label} disableGutters disablePadding>
             <ListItemButton sx={{ textAlign: 'center' }} onClick={() => {handleRoute(route)}}>
               <ListItemText primary={label} />
             </ListItemButton>
@@ -67,7 +67,7 @@ const Navigation = () => {
             <MenuIcon />
           </IconButton>
           <Typography variant='h6' component='div' sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
-            TDAV Sandbox
+            Sandbox
           </Typography>
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             {navRoutes.map(({label, route}) => (
