@@ -5,6 +5,7 @@ import { SnackbarProvider } from 'notistack'
 import { BrowserRouter } from 'react-router-dom'
 import './app.css'
 import { createTheme, ThemeProvider } from '@mui/material'
+import { LoadingProvider } from './lib/LoadingContext.jsx'
 
 const theme = createTheme({
   palette: {
@@ -17,7 +18,9 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <SnackbarProvider>
-          <App />
+          <LoadingProvider>
+            <App />
+          </LoadingProvider>
         </SnackbarProvider>
       </ThemeProvider>
     </BrowserRouter>

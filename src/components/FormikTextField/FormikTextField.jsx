@@ -1,5 +1,6 @@
 import { Box, TextField } from '@mui/material';
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const FormikTextField = (props) => {
   return(
@@ -19,6 +20,21 @@ const FormikTextField = (props) => {
       />
     </Box>
   );
+};
+
+FormikTextField.propTypes = {
+  /**
+   * Formik object to hook into
+   */
+  formik: PropTypes.object.isRequired,
+  /**
+   * Field name
+   */
+  name: PropTypes.string.isRequired,
+  /**
+   * Textfield Label
+   */
+  label: PropTypes.string
 };
 
 export default FormikTextField;

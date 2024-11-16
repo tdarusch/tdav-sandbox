@@ -1,8 +1,9 @@
-import { AppBar, Box, Button, Container, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, Container, Divider, Drawer, IconButton, LinearProgress, List, ListItem, ListItemButton, ListItemText, Toolbar, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Outlet, useNavigate } from 'react-router';
 import { makeStyles } from '@mui/styles';
+import { useLoading } from '../../lib/LoadingContext';
 
 const drawerWidth = 240;
 
@@ -26,6 +27,7 @@ const Navigation = () => {
   const navigate = useNavigate();
   const container = window.document.body;
   const { toolbar } = useStyles();
+  const { isLoading } = useLoading();
 
   const handleDrawerToggle = () => {
     setDrawerOpen(prevState => !prevState);
@@ -75,6 +77,7 @@ const Navigation = () => {
             ))}
           </Box>
         </Toolbar>
+        {isLoading && <LinearProgress />}
       </AppBar>
       <nav>
         <Drawer
