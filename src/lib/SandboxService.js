@@ -3,7 +3,11 @@ import axios from "axios";
 class SandboxService {
   constructor(baseURL) {
     this.axiosInstance = axios.create({
-      baseURL
+      baseURL,
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`,
+        'Content-Type': 'application/json'
+      }
     });
   }
 
@@ -27,7 +31,7 @@ class SandboxService {
 
   async put(url, data, config = {}) {
     try {
-      const { data: responseData } = await this.axiosInstance.post(url, data, config);
+      const { data: responseData } = await this.axiosInstance.put(url, data, config);
       return responseData;
     } catch (error) {
       throw error;
