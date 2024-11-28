@@ -12,9 +12,11 @@ import CancelIcon from '@mui/icons-material/Clear';
 import AddIcon from '@mui/icons-material/Add';
 import WorkIcon from '@mui/icons-material/Work';
 import SchoolIcon from '@mui/icons-material/School';
+import ProjectIcon from '@mui/icons-material/Construction';
 import FormikTextField from '../FormikTextField/FormikTextField';
 import JobDialog from './ResumeUtility/JobDialog';
 import EducationDialog from './ResumeUtility/EducationDialog';
+import ProjectDialog from './ResumeUtility/ProjectDialog';
 
 const initialValues = {
   id: null,
@@ -49,8 +51,10 @@ const ResumeView = ({ id }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [jobDialogOpen, setJobDialogOpen] = useState(false);
   const [educationDialogOpen, setEducationDialogOpen] = useState(false);
+  const [projectDialogOpen, setProjectDialogOpen] = useState(false);
   const [selectedEducation, setSelectedEducation] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
   const { startLoading, stopLoading, isLoading } = useLoading();
   const { enqueueSnackbar } = useSnackbar();
   const { isAdmin } = useCurrentUser();
@@ -151,6 +155,46 @@ const ResumeView = ({ id }) => {
     setFieldValue('education', [...values.education.filter(e => e.id !== education.id)]);
   };
 
+  const handleProjectDialogCancel = () => {
+    setProjectDialogOpen(false);
+    setSelectedProject(null);
+  };
+
+  const handleAddProject = () => {
+    setSelectedProject(null);
+    setProjectDialogOpen(true);
+  };
+
+  const handleDeleteProject = (project) => {
+    setFieldValue('projects', [...values.projects.filter(p => p.id !== project.id)]);
+  };
+
+  const handleEditProject = (project) => {
+    setSelectedProject(project);
+    setProjectDialogOpen(true);
+  };
+
+  const handleAddSkill = () => {
+    setFieldValue('skills', [...values.skills, { skill: '', id: Math.random().toString(36) }]);
+  };
+
+  const handleDeleteSkill = (skill) => {
+    setFieldValue('skills', [...values.skills.filter(s => s.id !== skill.id)]);
+  };
+
+  const handleProjectDialogSave = (project) => {
+    if (project.id) {
+      setFieldValue('projects', [
+        ...values.projects.filter(p => p.id !== project.id),
+        project
+      ].sort((a, b) => b.startDate - a.startDate));
+    } else {
+      setFieldValue('projects', [...values.projects, { ...project, id: Math.random().toString(36) }]);
+    }
+    setProjectDialogOpen(false);
+    setSelectedProject(null);
+  }
+
   const handleEducationDialogSave = (education) => {
     if (education.id) {
       setFieldValue('education', [
@@ -178,10 +222,17 @@ const ResumeView = ({ id }) => {
   };
 
   return (
-    <Grid2 container spacing={1}>
+    <Grid2 container spacing={1} mb={2}>
       {isAdmin &&
         <>
-          <Grid2 size={{ xs: 12 }} display='flex' justifyContent={isEditing ? 'space-between' : 'right'} px={1} py={0.5} component={Card}>
+          <Grid2
+            size={{ xs: 12 }}
+            display='flex'
+            justifyContent={isEditing ? 'space-between' : 'right'}
+            px={1}
+            py={0.5}
+            component={Card}
+          >
             {!isEditing &&
               <Tooltip title='Edit Resume'>
                 <IconButton
@@ -254,7 +305,7 @@ const ResumeView = ({ id }) => {
           />
         }
         {!isEditing &&
-          <Typography textAlign='center'>{values?.name}</Typography>
+          <Typography textAlign='center' variant='h5'>{values?.name}</Typography>
         }
       </Grid2>
       <Grid2 size={{ xs: 12 }} display='flex' justifyContent='center'>
@@ -268,7 +319,7 @@ const ResumeView = ({ id }) => {
           />
         }
         {!isEditing &&
-          <Typography textAlign='center' variant='caption'>{values?.title}</Typography>
+          <Typography textAlign='center'>{values?.title}</Typography>
         }
       </Grid2>
       <Grid2 size={{ xs: 12 }} display='flex' justifyContent='center'>
@@ -287,7 +338,86 @@ const ResumeView = ({ id }) => {
           <Typography textAlign='center' variant='caption'>{values?.blurb}</Typography>
         }
       </Grid2>
-      <Grid2 size={{ xs: 12, md: 6 }} display='flex' flexDirection='column' alignItems='center' justifyContent='top'>
+      {(values.skills.length > 0 || isEditing) &&
+        <Grid2
+          size={{ xs: 12 }}
+          display='flex'
+          flexDirection='column'
+          alignItems='left'
+          justifyContent='top'
+          component={Card}
+          p={1}
+        >
+          <Box
+            display='flex'
+            justifyContent={isEditing ? 'space-between' : 'center'}
+            width='100%'
+            sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}
+            pb={isEditing && 0.5}
+            mb={isEditing && 0.5}
+            alignItems='center'
+
+          >
+            <Typography variant='h6'>Primary Skills</Typography>
+            {isEditing &&
+              <IconButton
+                color='primary'
+                onClick={handleAddSkill}
+                disabled={isSubmitting || isLoading}
+              >
+                <AddIcon />
+              </IconButton>
+            }
+          </Box>
+          {!isEditing &&
+            <Stack direction='row' flexWrap='wrap' gap={1} mt={1} justifyContent='center'>
+              {values.skills.map(skill => (
+                <Chip color='primary' label={skill.skill} key={skill.id} />
+              ))}
+            </Stack>
+          }
+          {isEditing &&
+            <>
+              {values.skills.map((skill, index) => (
+                <Box display='flex' key={skill.id} my={1}>
+                  <FormikTextField
+                    name={`skills[${index}].skill`}
+                    label=''
+                    formik={formik}
+                    charLimit={255}
+                  />
+                  <Box ml={1}>
+                    <IconButton
+                      color='error'
+                      onClick={() => handleDeleteSkill(skill)}
+                      disabled={isSubmitting || isLoading}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+              ))}
+            </>
+          }
+        </Grid2>
+      }
+      <Grid2
+        size={{ xs: 12, md: 6 }}
+        display='flex'
+        flexDirection='column'
+        alignItems='center'
+        justifyContent='top'
+        component={Card}
+        p={1}
+      >
+        <Box
+          display='flex'
+          justifyContent='left'
+          width='100%'
+          sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}
+        >
+          <Typography variant='h6'>Work Experience</Typography>
+        </Box>
         <Stepper orientation='vertical'>
           {values.jobs.map(job => (
             <Step key={job.id} active>
@@ -347,7 +477,23 @@ const ResumeView = ({ id }) => {
           </Box>
         }
       </Grid2>
-      <Grid2 size={{ xs: 12, md: 6 }} display='flex' flexDirection='column' alignItems='center' justifyContent='top'>
+      <Grid2
+        size={{ xs: 12, md: 6 }}
+        display='flex'
+        flexDirection='column'
+        alignItems='center'
+        justifyContent='top'
+        component={Card}
+        p={1}
+      >
+        <Box
+          display='flex'
+          justifyContent='left'
+          width='100%'
+          sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}
+        >
+          <Typography variant='h6'>Education</Typography>
+        </Box>
         <Stepper orientation='vertical'>
           {values.education.map(education => (
             <Step key={education.id} active>
@@ -400,6 +546,85 @@ const ResumeView = ({ id }) => {
           </Box>
         }
       </Grid2>
+      <Grid2
+        size={{ xs: 12 }}
+        display='flex'
+        flexDirection='column'
+        alignItems='center'
+        justifyContent='top'
+        component={Card}
+        p={1}
+      >
+        <Box
+          display='flex'
+          justifyContent='left'
+          width='100%'
+          sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}
+        >
+          <Typography variant='h6'>Projects</Typography>
+        </Box>
+        <Stepper orientation='vertical'>
+          {values.projects.map(project => (
+            <Step key={project.id} active>
+              <StepLabel slotProps={{ stepIcon: { icon: <ProjectIcon /> } }}>
+                <Box display='flex' justifyContent='left'>
+                  <Typography variant='h6'>{project.name}</Typography>
+                  {isEditing &&
+                    <>
+                      <Box ml={1}>
+                        <IconButton
+                          color='primary'
+                          onClick={() => handleEditProject(project)}
+                          disabled={isSubmitting || isLoading}
+                          size='small'
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </Box>
+                      <Box>
+                        <IconButton
+                          color='error'
+                          onClick={() => handleDeleteProject(project)}
+                          disabled={isSubmitting || isLoading}
+                          size='small'
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
+                    </>
+                  }
+                </Box>
+                <Typography variant='caption' fontStyle='italic'>{project.startDate} - {project.endDate || 'Present'}</Typography>
+              </StepLabel>
+              <StepContent>
+                <Typography variant='caption'>{project.description}</Typography>
+              </StepContent>
+            </Step>
+          ))}
+        </Stepper>
+        {isEditing &&
+          <Box my={1}>
+            <IconButton
+              color='primary'
+              onClick={handleAddProject}
+              disabled={isSubmitting || isLoading}
+            >
+              <AddIcon />
+            </IconButton>
+          </Box>
+        }
+      </Grid2>
+      {!isEditing &&
+        <Grid2
+          size={{ xs: 12 }}
+          display='flex'
+          justifyContent='center'
+        >
+          <Typography variant='caption' fontStyle='italic'>
+            {`Last updated ${values.lastUpdatedDate}.`}
+          </Typography>
+        </Grid2>
+      }
       <JobDialog
         open={jobDialogOpen}
         onCancel={handleJobDialogCancel}
@@ -411,6 +636,12 @@ const ResumeView = ({ id }) => {
         onCancel={handleEducationDialogCancel}
         onSave={handleEducationDialogSave}
         education={selectedEducation}
+      />
+      <ProjectDialog
+        open={projectDialogOpen}
+        onCancel={handleProjectDialogCancel}
+        onSave={handleProjectDialogSave}
+        project={selectedProject}
       />
     </Grid2>
   );
