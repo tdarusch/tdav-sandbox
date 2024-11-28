@@ -17,6 +17,8 @@ import FormikTextField from '../FormikTextField/FormikTextField';
 import JobDialog from './ResumeUtility/JobDialog';
 import EducationDialog from './ResumeUtility/EducationDialog';
 import ProjectDialog from './ResumeUtility/ProjectDialog';
+import StarIcon from '@mui/icons-material/Star';
+import StarOutlineIcon from '@mui/icons-material/StarOutline';
 
 const initialValues = {
   id: null,
@@ -47,8 +49,9 @@ const removeGeneratedIds = (resume) => {
   return temp;
 };
 
-const ResumeView = ({ id }) => {
+const ResumeView = ({ id, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [hoveringPrimary, setHoveringPrimary] = useState(false);
   const [jobDialogOpen, setJobDialogOpen] = useState(false);
   const [educationDialogOpen, setEducationDialogOpen] = useState(false);
   const [projectDialogOpen, setProjectDialogOpen] = useState(false);
@@ -73,6 +76,7 @@ const ResumeView = ({ id }) => {
         formik.setValues(data);
         enqueueSnackbar('Resume saved!', { variant: 'success' });
         setIsEditing(false);
+        onUpdate();
       } catch (error) {
         console.error('An error occurred while saving the resume.', error);
         enqueueSnackbar('An error occurred while saving the resume.', { variant: 'error' });
@@ -182,6 +186,19 @@ const ResumeView = ({ id }) => {
     setFieldValue('skills', [...values.skills.filter(s => s.id !== skill.id)]);
   };
 
+  const handlePrimaryMouseEnter = () => {
+    setHoveringPrimary(true);
+  };
+
+  const handlePrimaryMouseLeave = () => {
+    setHoveringPrimary(false);
+  };
+
+  const handleMakePrimary = () => {
+    setFieldValue('isPrimary', true);
+    handleSubmit();
+  };
+
   const handleProjectDialogSave = (project) => {
     if (project.id) {
       setFieldValue('projects', [
@@ -228,21 +245,39 @@ const ResumeView = ({ id }) => {
           <Grid2
             size={{ xs: 12 }}
             display='flex'
-            justifyContent={isEditing ? 'space-between' : 'right'}
+            justifyContent={'space-between'}
             px={1}
             py={0.5}
             component={Card}
+            alignItems='center'
+            mb={1}
           >
             {!isEditing &&
-              <Tooltip title='Edit Resume'>
-                <IconButton
-                  color='primary'
-                  onClick={handleEdit}
-                  disabled={isSubmitting || isLoading}
-                >
-                  <EditIcon />
-                </IconButton>
-              </Tooltip>
+              <>
+                <Tooltip title='Make Primary'>
+                  <IconButton
+                    color='primary'
+                    onClick={handleMakePrimary}
+                    onMouseEnter={handlePrimaryMouseEnter}
+                    onMouseLeave={handlePrimaryMouseLeave}
+                    disabled={isSubmitting || isLoading || values.isPrimary}
+                  >
+                    {(hoveringPrimary || values.isPrimary) ? <StarIcon /> : <StarOutlineIcon />}
+                  </IconButton>
+                </Tooltip>
+                <Box>
+                  <Typography>{values.resumeNickname || 'New Resume'}</Typography>
+                </Box>
+                <Tooltip title='Edit Resume'>
+                  <IconButton
+                    color='primary'
+                    onClick={handleEdit}
+                    disabled={isSubmitting || isLoading}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+              </>
             }
             {isEditing &&
               <>
@@ -614,7 +649,7 @@ const ResumeView = ({ id }) => {
           </Box>
         }
       </Grid2>
-      {!isEditing &&
+      {(!isEditing && values.lastUpdatedDate) &&
         <Grid2
           size={{ xs: 12 }}
           display='flex'
