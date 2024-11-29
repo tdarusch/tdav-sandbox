@@ -1,19 +1,18 @@
-import { lazy } from "react";
-import { CssBaseline, Typography } from "@mui/material";
-import Navigation from "./components/Navigation/Navigation";
+import { CssBaseline } from "@mui/material";
 import { Route, Routes } from "react-router";
-import { Secure } from "./components/SecureRoute/SecureRoute";
 import "./App.css";
+import Navigation from "./components/Navigation/Navigation";
+import { Secure } from "./components/SecureRoute/SecureRoute";
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-import Home from "./components/Home/Home";
 import Contact from "./components/Contact/Contact";
-import Messages from "./components/Messages/Messages";
+import Home from "./components/Home/Home";
 import LoginHandler from "./components/LoginHandler/LoginHandler";
+import Messages from "./components/Messages/Messages";
 import Resume from "./components/Resume/Resume";
 import UnknownRoute from "./components/UnknownRoute/UnknownRoute";
 
