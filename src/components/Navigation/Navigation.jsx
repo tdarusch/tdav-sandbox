@@ -55,8 +55,8 @@ const Navigation = () => {
   };
 
   const handleSignIn = () => {
-    const clientId = 'Ov23liTjhr8WXNdbACI3';
-    const redirectUri = 'http://localhost:5173/oauth/callback'
+    const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID
+    const redirectUri = `${window.location.origin}/oauth/callback`;
     const scope = 'read:user'
     const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
     window.location.href = githubAuthUrl;
