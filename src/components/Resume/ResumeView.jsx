@@ -1,24 +1,26 @@
-import { useFormik } from 'formik';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useLoading } from '../../lib/LoadingContext';
-import { useSnackbar } from 'notistack';
-import sandboxService from '../../lib/SandboxService';
-import { Avatar, Box, Card, Chip, Divider, Grid2, IconButton, Stack, Step, StepContent, StepLabel, Stepper, Tooltip, Typography } from '@mui/material';
-import { useCurrentUser } from '../../lib/UserContext';
+import AddIcon from '@mui/icons-material/Add';
+import CancelIcon from '@mui/icons-material/Clear';
+import ProjectIcon from '@mui/icons-material/Construction';
+import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
-import DeleteIcon from '@mui/icons-material/Delete';
-import CancelIcon from '@mui/icons-material/Clear';
-import AddIcon from '@mui/icons-material/Add';
-import WorkIcon from '@mui/icons-material/Work';
 import SchoolIcon from '@mui/icons-material/School';
-import ProjectIcon from '@mui/icons-material/Construction';
-import FormikTextField from '../FormikTextField/FormikTextField';
-import JobDialog from './ResumeUtility/JobDialog';
-import EducationDialog from './ResumeUtility/EducationDialog';
-import ProjectDialog from './ResumeUtility/ProjectDialog';
 import StarIcon from '@mui/icons-material/Star';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
+import WorkIcon from '@mui/icons-material/Work';
+import { Avatar, Box, Card, Chip, Grid2, IconButton, Stack, Step, StepContent, StepLabel, Stepper, Tooltip, Typography } from '@mui/material';
+import { useFormik } from 'formik';
+import { useSnackbar } from 'notistack';
+import React, { useCallback, useEffect, useState } from 'react';
+import * as Yup from 'yup';
+import { useLoading } from '../../lib/LoadingContext';
+import sandboxService from '../../lib/SandboxService';
+import { useCurrentUser } from '../../lib/UserContext';
+import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
+import FormikTextField from '../FormikTextField/FormikTextField';
+import EducationDialog from './ResumeUtility/EducationDialog';
+import JobDialog from './ResumeUtility/JobDialog';
+import ProjectDialog from './ResumeUtility/ProjectDialog';
 
 const initialValues = {
   id: null,
@@ -49,12 +51,19 @@ const removeGeneratedIds = (resume) => {
   return temp;
 };
 
-const ResumeView = ({ id, onUpdate }) => {
+const validationSchema = Yup.object().shape({
+  resumeNickname: Yup.string().required('Required'),
+  name: Yup.string().required('Required'),
+  title: Yup.string().required('Required')
+});
+
+const ResumeView = ({ id, onUpdate, onDelete, onCreate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [hoveringPrimary, setHoveringPrimary] = useState(false);
   const [jobDialogOpen, setJobDialogOpen] = useState(false);
   const [educationDialogOpen, setEducationDialogOpen] = useState(false);
   const [projectDialogOpen, setProjectDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEducation, setSelectedEducation] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -64,6 +73,8 @@ const ResumeView = ({ id, onUpdate }) => {
   const formik = useFormik({
     initialValues,
     enableReinitialize: true,
+    validationSchema,
+    validateOnChange: false,
     onSubmit: async (values) => {
       try {
         startLoading();
@@ -77,6 +88,7 @@ const ResumeView = ({ id, onUpdate }) => {
         enqueueSnackbar('Resume saved!', { variant: 'success' });
         setIsEditing(false);
         onUpdate();
+        onCreate(data.id);
       } catch (error) {
         console.error('An error occurred while saving the resume.', error);
         enqueueSnackbar('An error occurred while saving the resume.', { variant: 'error' });
@@ -112,8 +124,26 @@ const ResumeView = ({ id, onUpdate }) => {
     setIsEditing(true);
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
+    setDeleteDialogOpen(true);
+  };
 
+  const handleDeleteConfirm = async () => {
+    try {
+      startLoading();
+      await sandboxService.delete(`/resumes/${values.id}`, values);
+      setDeleteDialogOpen(false);
+      onDelete();
+    } catch (error) {
+      console.error('An error occured while deleting the resume.', error);
+      enqueueSnackbar('An error occured while deleting the resume.', { variant: 'error' });
+    } finally {
+      stopLoading();
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
   };
 
   const handleRevert = () => {
@@ -260,7 +290,7 @@ const ResumeView = ({ id, onUpdate }) => {
                     onClick={handleMakePrimary}
                     onMouseEnter={handlePrimaryMouseEnter}
                     onMouseLeave={handlePrimaryMouseLeave}
-                    disabled={isSubmitting || isLoading || values.isPrimary}
+                    disabled={isSubmitting || isLoading || values.isPrimary || !values.id}
                   >
                     {(hoveringPrimary || values.isPrimary) ? <StarIcon /> : <StarOutlineIcon />}
                   </IconButton>
@@ -295,7 +325,7 @@ const ResumeView = ({ id, onUpdate }) => {
                     <IconButton
                       color='error'
                       onClick={handleDelete}
-                      disabled={values.isPrimary || isSubmitting || isLoading}
+                      disabled={values.isPrimary || isSubmitting || isLoading || !values.id}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -678,6 +708,21 @@ const ResumeView = ({ id, onUpdate }) => {
         onSave={handleProjectDialogSave}
         project={selectedProject}
       />
+      <ConfirmationDialog
+        open={deleteDialogOpen}
+        title='Delete Resume'
+        confirmButtonText='Delete'
+        confirmButtonProps={{
+          color: 'error',
+          startIcon: <DeleteIcon />
+        }}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+        showWarningIcon
+        asyncConfirm
+      >
+        <Typography>Are you sure you want to delete this resume? This cannot be undone.</Typography>
+      </ConfirmationDialog>
     </Grid2>
   );
 };

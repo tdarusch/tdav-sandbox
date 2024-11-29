@@ -4,6 +4,7 @@ import ResumeView from './ResumeView';
 import { useLoading } from '../../lib/LoadingContext';
 import { useCurrentUser } from '../../lib/UserContext';
 import MenuIcon from '@mui/icons-material/Menu';
+import AddIcon from '@mui/icons-material/Add';
 import { useSnackbar } from 'notistack';
 import sandboxService from '../../lib/SandboxService';
 import dayjs from 'dayjs';
@@ -37,6 +38,19 @@ const Resume = () => {
     setSelectedResumeId(id);
   };
 
+  const handleDelete = () => {
+    setSelectedResumeId('primary');
+    getResumes();
+  };
+
+  const handleAddResume = () => {
+    setSelectedResumeId(null);
+  };
+
+  const handleCreate = (id) => {
+    setSelectedResumeId(id);
+  };
+
   return (
     <Box display='flex' justifyContent='center' mt={2}>
       <Box sx={{ width: { xs: '95%', sm: '75%' } }}>
@@ -62,15 +76,26 @@ const Resume = () => {
                   justifyContent='space-between'
                   alignItems='center'
                   pb={0.5}
+                  sx={{ borderBottom: (theme) => (showResumes ? `1px solid ${theme.palette.divider}` : 'none') }}
                 >
                   <Typography sx={{ ml: 2 }} variant='body2'>Resumes</Typography>
-                  <Box mr={1}>
-                    <IconButton
-                      onClick={() => { setShowResumes(prevVal => !prevVal) }}
-                      disabled={isLoading}
-                    >
-                      <MenuIcon />
-                    </IconButton>
+                  <Box display='flex'>
+                    <Box mr={0.5}>
+                      <IconButton
+                        color='primary'
+                        disabled={isLoading}
+                        onClick={handleAddResume}
+                      >
+                        <AddIcon />
+                      </IconButton>
+                    </Box>
+                    <Box mr={1}>
+                      <IconButton
+                        onClick={() => { setShowResumes(prevVal => !prevVal) }}
+                      >
+                        <MenuIcon />
+                      </IconButton>
+                    </Box>
                   </Box>
                 </Box>
                 <Collapse in={showResumes}>
@@ -84,7 +109,9 @@ const Resume = () => {
                       width='100%'
                       alignItems='center'
                     >
-                      <Typography>{`Primary (${resumes.find(r => r.isPrimary)?.nickname})`}</Typography>
+                      <Typography noWrap>
+                        {`Primary ${resumes.find(r => r.isPrimary)?.nickname ? `(${resumes.find(r => r.isPrimary).nickname})` : ''}`}
+                      </Typography>
                       <Typography variant='caption' fontStyle='italic'>
                         {resumes.find(resume => resume.isPrimary)?.lastUpdatedDate || 'N/A'}
                       </Typography>
@@ -102,7 +129,7 @@ const Resume = () => {
                         width='100%'
                         alignItems='center'
                       >
-                        <Typography>{resume.nickname || 'No name'}</Typography>
+                        <Typography noWrap>{resume.nickname || 'No name'}</Typography>
                         <Typography variant='caption' fontStyle='italic'>
                           {resume.lastUpdatedDate || dayjs(new Date()).format('MM/DD/YYYY')}
                         </Typography>
@@ -114,7 +141,12 @@ const Resume = () => {
             </Box>
           }
           <Box width='100%'>
-            <ResumeView id={selectedResumeId} onUpdate={getResumes} />
+            <ResumeView 
+              id={selectedResumeId} 
+              onUpdate={getResumes} 
+              onDelete={handleDelete} 
+              onCreate={handleCreate}
+            />
           </Box>
         </Box>
       </Box>

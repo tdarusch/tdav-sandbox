@@ -2,6 +2,7 @@ import { lazy } from "react";
 import { CssBaseline, Typography } from "@mui/material";
 import Navigation from "./components/Navigation/Navigation";
 import { Route, Routes } from "react-router";
+import { Secure } from "./components/SecureRoute/SecureRoute";
 import "./App.css";
 
 import '@fontsource/roboto/300.css';
@@ -14,6 +15,7 @@ import Contact from "./components/Contact/Contact";
 import Messages from "./components/Messages/Messages";
 import LoginHandler from "./components/LoginHandler/LoginHandler";
 import Resume from "./components/Resume/Resume";
+import UnknownRoute from "./components/UnknownRoute/UnknownRoute";
 
 const App = () => {
   return (
@@ -24,8 +26,9 @@ const App = () => {
           <Route path='' element={<Home />} />
           <Route path='resume' element={<Resume />} />
           <Route path='contact' element={<Contact />} />
-          <Route path='messages' element={<Messages />} />
+          <Route path='messages' element={Secure(<Messages />)} />
           <Route path='oauth/callback' element={<LoginHandler />} />
+          <Route path='*' element={<UnknownRoute />} />
         </Route>
       </Routes>
     </>

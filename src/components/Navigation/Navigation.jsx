@@ -1,10 +1,11 @@
-import { AppBar, Box, Button, Container, Divider, Drawer, IconButton, LinearProgress, List, ListItem, ListItemButton, ListItemText, Toolbar, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { AppBar, Box, Button, Container, Divider, Drawer, IconButton, LinearProgress, List, ListItem, ListItemButton, ListItemText, Tab, Tabs, Toolbar, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Outlet, useNavigate } from 'react-router';
+import { Outlet, useLocation, useNavigate } from 'react-router';
 import { makeStyles } from '@mui/styles';
 import { useLoading } from '../../lib/LoadingContext';
 import { useCurrentUser } from '../../lib/UserContext';
+import BuildIcon from '@mui/icons-material/BuildCircle';
 
 const drawerWidth = 240;
 
@@ -42,6 +43,7 @@ const Navigation = () => {
   const { toolbar } = useStyles();
   const { isLoading } = useLoading();
   const { isAdmin, isLoggedIn, logOut } = useCurrentUser();
+  const { pathname } = useLocation();
 
   const handleDrawerToggle = () => {
     setDrawerOpen(prevState => !prevState);
@@ -66,18 +68,41 @@ const Navigation = () => {
     navigate('/')
   };
 
+  const handleTabChange = (_, route) => {
+    if (route === 'login') {
+      if (isLoggedIn) {
+        handleSignOut();
+      } else {
+        handleSignIn();
+      }
+    } else {
+      handleRoute(route);
+    }
+  };
+
   const filterRoutes = (route) => {
     return (!route.secured || isAdmin);
-  }
+  };
+
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [pathname]);
 
   const mobileDrawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
-      <Typography variant='h6'>Sandbox</Typography>
+      <Box display='flex' justifyContent='center' alignItems='center' my={1}>
+        <Typography variant='h6' sx={{ alignItems: 'center' }}>
+          Sandbox
+        </Typography>
+        <Box display='flex' ml={1}>
+          <BuildIcon color='primary'/>
+        </Box>
+      </Box>
       <Divider />
       <List>
         {navRoutes.filter(filterRoutes).map(({ label, route }) => (
           <ListItem key={label} disableGutters disablePadding>
-            <ListItemButton sx={{ textAlign: 'center' }} onClick={() => {handleRoute(route)}}>
+            <ListItemButton sx={{ textAlign: 'center' }} onClick={() => { handleRoute(route) }}>
               <ListItemText primary={label} />
             </ListItemButton>
           </ListItem>
@@ -91,7 +116,7 @@ const Navigation = () => {
     </Box>
   );
 
-  return(
+  return (
     <Box display='flex' height='100%' width='100%'>
       <AppBar component='nav'>
         <Toolbar variant='dense'>
@@ -103,18 +128,38 @@ const Navigation = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant='h6' component='div' sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
+          <Typography
+            variant='h6' 
+            component='div'
+            sx={{ 
+              flexGrow: 1, 
+              alignItems: 'center',
+              display: { xs: 'none', sm: 'flex' } 
+            }}
+          >
             Sandbox
+            <Box display='flex' ml={1}>
+              <BuildIcon color='primary'/>
+            </Box>
           </Typography>
-          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            {navRoutes.filter(filterRoutes).map(({label, route}) => (
-              <Button key={label} sx={{ color: '#fff' }} onClick={() => {handleRoute(route)}}>
-                {label}
-              </Button>
-            ))}
-            <Button sx={{ color: '#fff' }} onClick={isLoggedIn ? handleSignOut : handleSignIn}>
-              {isLoggedIn ? 'Sign Out' : 'Sign In'}
-            </Button>
+          <Box sx={{ display: { xs: 'none', sm: 'block' }, maxWidth: 450 }}>
+            <Tabs
+              value={pathname}
+              onChange={handleTabChange}
+              variant='scrollable'
+              scrollButtons
+              TabIndicatorProps={{
+                hidden: true
+              }}
+            >
+              {navRoutes.filter(filterRoutes).map(({ label, route }, index) => (
+                <Tab label={label} value={route} key={index} />
+              ))}
+              <Tab
+                label={isLoggedIn ? 'Sign Out' : 'Sign In'}
+                value='login'
+              />
+            </Tabs>
           </Box>
         </Toolbar>
         {isLoading && <LinearProgress />}
@@ -136,7 +181,7 @@ const Navigation = () => {
       </nav>
       <div className={toolbar} />
       <Box width='100%'>
-        <Toolbar variant='dense'/>
+        <Toolbar variant='dense' />
         <Outlet />
       </Box>
     </Box>
