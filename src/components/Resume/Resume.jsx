@@ -20,7 +20,7 @@ const Resume = () => {
   const getResumes = useCallback(async () => {
     try {
       startLoading();
-      const data = await sandboxService.get('/resumes');
+      const data = await sandboxService.get('/admin/resumes');
       setResumes(data);
     } catch (error) {
       console.error('An error occurred while fetching resumes.', error);

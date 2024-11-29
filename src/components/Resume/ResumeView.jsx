@@ -80,9 +80,9 @@ const ResumeView = ({ id, onUpdate, onDelete, onCreate }) => {
         startLoading();
         let data = {};
         if (values.id) {
-          data = await sandboxService.put(`/resumes/${values.id}`, removeGeneratedIds(values));
+          data = await sandboxService.put(`/admin/resumes/${values.id}`, removeGeneratedIds(values));
         } else {
-          data = await sandboxService.post('/resumes', removeGeneratedIds(values));
+          data = await sandboxService.post('/admin/resumes', removeGeneratedIds(values));
         }
         formik.setValues(data);
         enqueueSnackbar('Resume saved!', { variant: 'success' });
@@ -106,7 +106,12 @@ const ResumeView = ({ id, onUpdate, onDelete, onCreate }) => {
     }
     try {
       startLoading();
-      const data = await sandboxService.get(`/resumes/${id}`);
+      let data = {};
+      if (id !== 'primary') {
+        data = await sandboxService.get(`/admin/resumes/${id}`);
+      } else {
+        data = await sandboxService.get('/resumes/primary');
+      }
       setValues(data);
     } catch (error) {
       console.error('An error occurred while fetching the resume.', error);
@@ -131,7 +136,7 @@ const ResumeView = ({ id, onUpdate, onDelete, onCreate }) => {
   const handleDeleteConfirm = async () => {
     try {
       startLoading();
-      await sandboxService.delete(`/resumes/${values.id}`, values);
+      await sandboxService.delete(`/admin/resumes/${values.id}`, values);
       setDeleteDialogOpen(false);
       onDelete();
     } catch (error) {

@@ -81,7 +81,7 @@ const Messages = () => {
       if (initialLoad) {
         startLoading();
       }
-      const data = await sandboxService.get('/messages', { params: { archived } });
+      const data = await sandboxService.get('/admin/messages', { params: { archived } });
       setMessages(data);
     } catch (error) {
       console.error('An error occurred while fetching messages.', error)
@@ -100,7 +100,7 @@ const Messages = () => {
   const handleFlag = async (message) => {
     try {
       startLoading();
-      const updatedMessage = await sandboxService.put(`/messages/${message.id}`, message);
+      const updatedMessage = await sandboxService.put(`/admin/messages/${message.id}`, message);
       setMessages(prevMessages => prevMessages.map(prevMessage => {
         if (prevMessage.id === updatedMessage.id) {
           return updatedMessage;
@@ -118,7 +118,7 @@ const Messages = () => {
   const handleUpdate = async (message) => {
     try {
       startLoading();
-      await sandboxService.put(`/messages/${message.id}`, message);
+      await sandboxService.put(`/admin/messages/${message.id}`, message);
       getMessages();
     } catch (error) {
       console.error('An error occurred while archiving the message.', error)
@@ -131,7 +131,7 @@ const Messages = () => {
   const handleDelete = async (message) => {
     try {
       startLoading();
-      await sandboxService.delete(`/messages/${message.id}`, message);
+      await sandboxService.delete(`/admin/messages/${message.id}`, message);
       getMessages();
     } catch (error) {
       console.error('An error occurred while deleting the message.', error)
