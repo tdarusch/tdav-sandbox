@@ -31,8 +31,10 @@ const Resume = () => {
   }, [enqueueSnackbar]);
 
   useEffect(() => {
-    getResumes();
-  }, [getResumes]);
+    if (isAdmin) {
+      getResumes();
+    }
+  }, [getResumes, isAdmin]);
 
   const handleSelectResume = (id) => {
     setSelectedResumeId(id);
