@@ -2,7 +2,7 @@ import { useSnackbar } from 'notistack';
 import React, { useEffect, useState, useCallback } from 'react';
 import { useLoading } from '../../lib/LoadingContext';
 import sandboxService from '../../lib/SandboxService';
-import { Box, Card, CardActionArea, Grid2, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, Button, ButtonGroup, Card, CardActionArea, Grid2, IconButton, Tooltip, Typography } from '@mui/material';
 import OutlinedStarIcon from '@mui/icons-material/StarBorder';
 import FilledStarIcon from '@mui/icons-material/Star';
 import ArchiveIcon from '@mui/icons-material/Archive';
@@ -140,10 +140,31 @@ const Messages = () => {
       stopLoading();
     }
   };
+
+  const handleArchiveToggle = (archivedValue) => {
+    setArchived(archivedValue);
+    getMessages();
+  };
   
   return(
     <Box display='flex' justifyContent='center' >
-      <Box display='flex' flexDirection='column' width={{ xs: '95%', sm: '60%' }}>
+      <Box display='flex' flexDirection='column' width={{ xs: '95%', sm: '60%' }} mt={3}>
+        <Box display='flex' justifyContent='center'>
+          <ButtonGroup>
+            <Button
+              variant={archived ? 'outlined' : 'contained'}
+              onClick={() => handleArchiveToggle(false)}
+            >
+              Active
+            </Button>
+            <Button
+              variant={!archived ? 'outlined' : 'contained'}
+              onClick={() => handleArchiveToggle(true)}
+            >
+              Archived
+            </Button>
+          </ButtonGroup>
+        </Box>
         {messages?.map(message => (
           <Box key={message.id} my={1}>
             <MessageItem message={message} onFlag={handleFlag} onArchive={handleUpdate} onDelete={handleDelete} />
